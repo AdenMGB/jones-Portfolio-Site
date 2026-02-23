@@ -618,9 +618,17 @@ function resetGame() {
 
 const handleKeydown = (event) => {
   if (
-    ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(
-      event.code,
-    )
+    [
+      "Space",
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "KeyW",
+      "KeyA",
+      "KeyS",
+      "KeyD",
+    ].includes(event.code)
   ) {
     event.preventDefault();
   }
@@ -632,25 +640,30 @@ const handleKeydown = (event) => {
   }
   if (isPaused) return;
 
-  if (event.keyCode === 37 || event.keyCode === 39 || event.keyCode === 40) {
+  const isLeft = event.keyCode === 37 || event.keyCode === 65; // Left or A
+  const isRight = event.keyCode === 39 || event.keyCode === 68; // Right or D
+  const isDown = event.keyCode === 40 || event.keyCode === 83; // Down or S
+  const isUp = event.keyCode === 38 || event.keyCode === 87; // Up or W
+
+  if (isLeft || isRight || isDown) {
     if (event.repeat) return;
 
-    if (keys[event.keyCode]) {
-      keys[event.keyCode].down = true;
-      keys[event.keyCode].timer = 0;
-      if (event.keyCode === 37) playerMove(-1);
-      if (event.keyCode === 39) playerMove(1);
-      if (event.keyCode === 40) {
-        if (playerDrop()) {
-          player.score += 1;
-          updateScore();
-        }
+    const targetKey = isLeft ? 37 : isRight ? 39 : 40;
+
+    keys[targetKey].down = true;
+    keys[targetKey].timer = 0;
+    if (isLeft) playerMove(-1);
+    if (isRight) playerMove(1);
+    if (isDown) {
+      if (playerDrop()) {
+        player.score += 1;
+        updateScore();
       }
     }
     return;
   }
 
-  if (event.keyCode === 38) {
+  if (isUp) {
     playerRotate(1);
   } else if (event.keyCode === 32) {
     playerHardDrop();
@@ -660,9 +673,21 @@ const handleKeydown = (event) => {
 };
 
 const handleKeyup = (event) => {
-  if (keys[event.keyCode]) {
-    keys[event.keyCode].down = false;
-    keys[event.keyCode].timer = 0;
+  const isLeft = event.keyCode === 37 || event.keyCode === 65;
+  const isRight = event.keyCode === 39 || event.keyCode === 68;
+  const isDown = event.keyCode === 40 || event.keyCode === 83;
+
+  if (isLeft) {
+    keys[37].down = false;
+    keys[37].timer = 0;
+  }
+  if (isRight) {
+    keys[39].down = false;
+    keys[39].timer = 0;
+  }
+  if (isDown) {
+    keys[40].down = false;
+    keys[40].timer = 0;
   }
 };
 
