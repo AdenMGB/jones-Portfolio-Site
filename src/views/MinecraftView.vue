@@ -29,11 +29,7 @@ const copyToClipboard = () => {
   <div class="content-wrap mc-page">
     <h1
       class="name-title"
-      style="
-        margin-top: 20px !important;
-        margin-bottom: 4px !important;
-        font-size: 72px;
-      "
+      style="margin-top: 20px !important; margin-bottom: 4px !important"
     >
       Minecraft Server
     </h1>
@@ -95,6 +91,12 @@ const copyToClipboard = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.name-title {
+  font-size: 72px;
+  line-height: 1.1;
+  text-align: center;
 }
 
 .ip-container {
@@ -261,6 +263,11 @@ const copyToClipboard = () => {
 }
 
 @media (max-width: 600px) {
+  .name-title {
+    font-size: 52px;
+    line-height: 1.2;
+  }
+
   .ip-container {
     flex-direction: column;
     border-radius: 20px;
