@@ -2,7 +2,7 @@
 import { ref } from "vue";
 
 const serverIP = ref("mc.jonesjankovic.com");
-const copyStatus = ref("Copy IP");
+const isCopied = ref(false);
 
 const mods = [
   "Iron's Spells 'n Spellbooks",
@@ -18,9 +18,9 @@ const mods = [
 
 const copyToClipboard = () => {
   navigator.clipboard.writeText(serverIP.value);
-  copyStatus.value = "Copied!";
+  isCopied.value = true;
   setTimeout(() => {
-    copyStatus.value = "Copy IP";
+    isCopied.value = false;
   }, 2000);
 };
 </script>
@@ -44,8 +44,15 @@ const copyToClipboard = () => {
 
     <div class="ip-container">
       <code class="ip-text">{{ serverIP }}</code>
-      <button @click="copyToClipboard" class="copy-pill">
-        {{ copyStatus }}
+      <button
+        @click="copyToClipboard"
+        class="copy-pill"
+        :class="{ 'is-copied': isCopied }"
+      >
+        <span v-if="!isCopied">Copy IP</span>
+        <span v-else class="success-text">
+          <span class="green-dot"></span> Copied!
+        </span>
       </button>
     </div>
 
@@ -85,6 +92,9 @@ const copyToClipboard = () => {
   max-width: 800px;
   margin: 0 auto;
   padding-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .ip-container {
@@ -116,12 +126,48 @@ const copyToClipboard = () => {
   cursor: pointer;
   font-size: 0.8rem;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 100px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.copy-pill:hover {
+.copy-pill:hover:not(.is-copied) {
   background: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.2);
+}
+
+.copy-pill.is-copied {
+  background: rgba(46, 213, 115, 0.1);
+  border-color: rgba(46, 213, 115, 0.3);
+  color: #2ed573;
+}
+
+.success-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.green-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #2ed573;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(46, 213, 115, 0.6);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .mc-content {
