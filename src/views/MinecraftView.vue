@@ -121,13 +121,13 @@ const copyToClipboard = () => {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid transparent;
   color: white;
-  padding: 8px 20px;
+  padding: 8px 0;
   border-radius: 100px;
   cursor: pointer;
   font-size: 0.8rem;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 100px;
+  width: 110px;
   display: inline-flex;
   justify-content: center;
   align-items: center;
