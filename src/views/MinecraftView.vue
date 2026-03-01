@@ -26,7 +26,7 @@ const copyToClipboard = () => {
 </script>
 
 <template>
-  <img src="/minecraft.png" class="mc-bg-overlay" loading="lazy" alt="" />
+  <img src="/minecraft.png" class="mc-bg-overlay" alt="" />
 
   <div class="content-wrap mc-page">
     <h1
@@ -258,6 +258,9 @@ const copyToClipboard = () => {
   text-align: center;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  clip-path: inset(0 round 20px);
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .clean-list {
