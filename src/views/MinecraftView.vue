@@ -249,7 +249,7 @@ const copyToClipboard = () => {
 }
 
 .content-box {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   padding: 30px;
