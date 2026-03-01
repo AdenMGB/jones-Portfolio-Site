@@ -21,7 +21,7 @@ const toggleFullscreen = () => {
     <div class="mobile-msg">
       <div class="content-wrap">
         <h1 class="name-title">Not supported on mobile</h1>
-        <RouterLink to="/games" class="repo-link">← Back to games</RouterLink>
+        <RouterLink to="/arcade" class="repo-link">← Back to arcade</RouterLink>
       </div>
     </div>
 

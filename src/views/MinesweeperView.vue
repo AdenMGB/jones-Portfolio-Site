@@ -218,10 +218,10 @@ const gridStyle = computed(() => ({
           Not supported on mobile
         </h1>
         <RouterLink
-          to="/games"
+          to="/arcade"
           class="repo-link"
           style="color: lightskyblue; text-decoration: none"
-          >← Back to games</RouterLink
+          >← Back to arcade</RouterLink
         >
       </div>
     </div>

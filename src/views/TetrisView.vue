@@ -761,7 +761,7 @@ onUnmounted(() => {
           Not supported on mobile
         </h1>
         <RouterLink
-          to="/games"
+          to="/arcade"
           class="repo-link"
           style="
             font-size: 14px;
@@ -769,7 +769,7 @@ onUnmounted(() => {
             color: lightskyblue;
             text-decoration: none;
           "
-          >← Back to games</RouterLink
+          >← Back to arcade</RouterLink
         >
       </div>
     </div>

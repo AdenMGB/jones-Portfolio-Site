@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
-import GamesView from "../views/GamesView.vue";
+import ArcadeView from "../views/ArcadeView.vue";
 import PongView from "../views/PongView.vue";
 import TetrisView from "../views/TetrisView.vue";
 import MinesweeperView from "../views/MinesweeperView.vue";
@@ -25,10 +25,10 @@ const router = createRouter({
       meta: { title: "Home" },
     },
     {
-      path: "/games",
-      name: "games",
-      component: GamesView,
-      meta: { title: "Games" },
+      path: "/arcade",
+      name: "arcade",
+      component: ArcadeView,
+      meta: { title: "Arcade" },
     },
     {
       path: "/minecraft",
@@ -37,25 +37,25 @@ const router = createRouter({
       meta: { title: "Minecraft" },
     },
     {
-      path: "/games/tetris",
+      path: "/arcade/tetris",
       name: "tetris",
       component: TetrisView,
       meta: { title: "Tetris" },
     },
     {
-      path: "/games/pong",
+      path: "/arcade/pong",
       name: "pong",
       component: PongView,
       meta: { title: "Pong" },
     },
     {
-      path: "/games/minesweeper",
+      path: "/arcade/minesweeper",
       name: "minesweeper",
       component: MinesweeperView,
       meta: { title: "Minesweeper" },
     },
     {
-      path: "/games/stickman-hook",
+      path: "/arcade/stickman-hook",
       name: "stickman-hook",
       component: StickManHookView,
       meta: { title: "Stickman Hook" },
