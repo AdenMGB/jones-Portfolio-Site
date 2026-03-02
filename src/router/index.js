@@ -7,6 +7,9 @@ import MinesweeperView from "../views/MinesweeperView.vue";
 import StickManHookView from "../views/StickManHookView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import MinecraftView from "../views/MinecraftView.vue";
+import Game2048View from "@/views/Game2048View.vue";
+import HangmanView from "@/views/HangmanView.vue";
+import NoughtsAndCrossesView from "@/views/NoughtsAndCrossesView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -59,6 +62,24 @@ const router = createRouter({
       name: "stickman-hook",
       component: StickManHookView,
       meta: { title: "Stickman Hook" },
+    },
+    {
+      path: "/arcade/2048",
+      name: "2048",
+      component: Game2048View,
+      meta: { title: "2048" },
+    },
+    {
+      path: "/arcade/noughts-and-crosses",
+      name: "noughts-and-crosses",
+      component: NoughtsAndCrossesView,
+      meta: { title: "Noughts and Crosses" },
+    },
+    {
+      path: "/arcade/hangman",
+      name: "hangman",
+      component: HangmanView,
+      meta: { title: "Hangman" },
     },
     {
       path: "/:pathMatch(.*)*",

@@ -19,7 +19,7 @@ import { RouterLink } from "vue-router";
       A collection of modern and classic browser games.
     </p>
 
-    <div class="arcade-grid">
+    <div class="arcade-row-1">
       <div class="arcade-card">
         <div class="arcade-card-top">
           <span class="arcade-icon">🧱</span>
@@ -60,8 +60,43 @@ import { RouterLink } from "vue-router";
         </div>
         <RouterLink
           to="/arcade/stickman-hook"
-          class="arcade-card-bottom yellow-btn"
+          class="arcade-card-bottom red-btn"
         >
+          Play Now
+        </RouterLink>
+      </div>
+    </div>
+
+    <div class="arcade-row-2">
+      <div class="arcade-card">
+        <div class="arcade-card-top">
+          <span class="arcade-icon">🧍</span>
+          <h3 class="arcade-name">Hangman</h3>
+        </div>
+        <RouterLink to="/arcade/hangman" class="arcade-card-bottom green-btn">
+          Play Now
+        </RouterLink>
+      </div>
+
+      <div class="arcade-card">
+        <div class="arcade-card-top">
+          <span class="arcade-icon">⭕</span>
+          <h3 class="arcade-name">Noughts & Crosses</h3>
+        </div>
+        <RouterLink
+          to="/arcade/noughts-and-crosses"
+          class="arcade-card-bottom red-btn"
+        >
+          Play Now
+        </RouterLink>
+      </div>
+
+      <div class="arcade-card">
+        <div class="arcade-card-top">
+          <span class="arcade-icon">🔢</span>
+          <h3 class="arcade-name">2048</h3>
+        </div>
+        <RouterLink to="/arcade/2048" class="arcade-card-bottom blue-btn">
           Play Now
         </RouterLink>
       </div>

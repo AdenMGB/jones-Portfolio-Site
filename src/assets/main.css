@@ -461,13 +461,22 @@ main {
   font-weight: 400;
 }
 
-.arcade-grid {
+.arcade-row-1,
+.arcade-row-2 {
   display: grid;
-  grid-template-columns: repeat(4, 250px);
   gap: 21px;
   width: 100%;
   max-width: 900px;
   justify-content: center;
+  margin: 0 auto 6px auto;
+}
+
+.arcade-row-1 {
+  grid-template-columns: repeat(4, 250px);
+}
+
+.arcade-row-2 {
+  grid-template-columns: repeat(3, 250px);
 }
 
 @media (max-width: 600px) {
