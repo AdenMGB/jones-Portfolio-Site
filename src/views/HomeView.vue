@@ -230,7 +230,6 @@ onUnmounted(() => {
   align-items: center;
 }
 
-/* Above fold - fills viewport, centered column */
 .above-fold {
   min-height: calc(100vh - 160px);
   width: 100%;
@@ -243,7 +242,6 @@ onUnmounted(() => {
   box-sizing: border-box;
 }
 
-/* Hero block - centered, stacked */
 .hero-block {
   display: flex;
   flex-direction: column;
@@ -261,7 +259,6 @@ onUnmounted(() => {
   transform: translateY(0);
 }
 
-/* Avatar */
 .avatar-wrap {
   position: relative;
   width: 190px;
@@ -320,7 +317,6 @@ onUnmounted(() => {
   animation: glow-pulse 3s ease-in-out infinite;
 }
 
-/* Name */
 .name-title {
   margin: 0;
   font-size: clamp(36px, 6vw, 56px);
@@ -334,7 +330,6 @@ onUnmounted(() => {
   background-clip: text;
 }
 
-/* Tag pill */
 .hero-tag {
   display: inline-flex;
   align-items: center;
@@ -349,7 +344,6 @@ onUnmounted(() => {
   border-radius: 100px;
 }
 
-/* Divider */
 .hero-divider {
   width: 40px;
   height: 2px;
@@ -357,7 +351,6 @@ onUnmounted(() => {
   border-radius: 2px;
 }
 
-/* Snake */
 .snake-wrap {
   width: min(100%, 900px);
   display: flex;
@@ -382,7 +375,6 @@ onUnmounted(() => {
   opacity: 0.95;
 }
 
-/* Scroll cue */
 .scroll-cue {
   display: flex;
   align-items: center;
@@ -402,7 +394,6 @@ onUnmounted(() => {
   animation: bounce-cue 2s ease-in-out infinite;
 }
 
-/* Content sections */
 .content-wrap {
   width: min(90%, 800px);
   display: flex;
@@ -431,7 +422,6 @@ onUnmounted(() => {
   gap: 8px;
 }
 
-/* Repo grid - equal heights */
 .repo-button-grid {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important;
@@ -464,8 +454,6 @@ onUnmounted(() => {
   color: lightskyblue;
   transform: translateY(-50%) translateX(3px);
 }
-
-/* Keyframes */
 
 @keyframes spin-ring {
   from {
