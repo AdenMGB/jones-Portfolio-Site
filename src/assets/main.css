@@ -480,7 +480,8 @@ main {
 }
 
 @media (max-width: 600px) {
-  .arcade-grid {
+  .arcade-row-1,
+  .arcade-row-2 {
     grid-template-columns: 1fr;
   }
 }
