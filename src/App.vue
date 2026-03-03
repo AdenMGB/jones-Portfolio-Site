@@ -1,11 +1,14 @@
 <script setup>
-import { RouterLink, RouterView } from "vue-router";
-import { ref, onMounted, onUnmounted } from "vue";
+import { RouterLink, RouterView, useRoute } from "vue-router";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 
+const route = useRoute();
 const isMinimized = ref(false);
 const shouldShow = ref(true);
 const currentYear = new Date().getFullYear();
 let lastScrollY = 0;
+
+const isHomePage = computed(() => route.path === "/");
 
 const handleScroll = () => {
   const currentScrollY = window.scrollY;
@@ -75,7 +78,7 @@ onUnmounted(() => {
     </div>
   </header>
 
-  <main>
+  <main :class="{ 'home-page': isHomePage }">
     <RouterView />
   </main>
 
