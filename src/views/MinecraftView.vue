@@ -110,7 +110,7 @@ const copyToClipboard = () => {
   z-index: -1;
   object-fit: cover;
   object-position: center top;
-  opacity: 0.2;
+  opacity: 0.25;
   pointer-events: none;
   -webkit-mask-image: linear-gradient(
     to bottom,
