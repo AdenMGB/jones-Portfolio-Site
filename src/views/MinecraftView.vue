@@ -29,12 +29,7 @@ const copyToClipboard = () => {
   <img src="/minecraft.png" class="mc-bg-overlay" alt="" />
 
   <div class="content-wrap mc-page">
-    <h1
-      class="name-title"
-      style="margin-top: 20px !important; margin-bottom: 4px !important"
-    >
-      Minecraft Server
-    </h1>
+    <h1 class="name-title">Minecraft Server</h1>
 
     <p class="arcade-subtitle">
       Iron's Spells 'n Spellbooks | Modded 1.21.1 Java | Semi-Anarchy
@@ -142,6 +137,15 @@ const copyToClipboard = () => {
   font-size: 72px;
   line-height: 1.1;
   text-align: center;
+  margin-top: 20px;
+  margin-bottom: 4px;
+}
+
+.arcade-subtitle {
+  color: #94a3b8;
+  font-size: 1.05rem;
+  margin-bottom: 24px;
+  font-weight: 400;
 }
 
 .ip-container {

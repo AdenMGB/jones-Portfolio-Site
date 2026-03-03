@@ -353,8 +353,6 @@ onUnmounted(() => {
 
 .snake-wrap {
   width: min(100%, 900px);
-  display: flex;
-  justify-content: center;
   opacity: 0;
   transform: translateY(16px);
   transition:
@@ -369,10 +367,6 @@ onUnmounted(() => {
 
 .snake-image {
   width: 100%;
-  height: auto;
-  display: block;
-  filter: drop-shadow(0 16px 30px rgba(3, 6, 16, 0.5));
-  opacity: 0.95;
 }
 
 .scroll-cue {
@@ -395,9 +389,6 @@ onUnmounted(() => {
 }
 
 .content-wrap {
-  width: min(90%, 800px);
-  display: flex;
-  flex-direction: column;
   gap: 20px;
   margin-top: 24px;
   padding-bottom: 60px;
@@ -411,48 +402,6 @@ onUnmounted(() => {
 .loaded .content-wrap {
   opacity: 1;
   transform: translateY(0);
-}
-
-.contact-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.repo-button-grid {
-  display: grid !important;
-  grid-template-columns: repeat(2, 1fr) !important;
-  grid-auto-rows: 1fr !important;
-  gap: 12px !important;
-  align-items: stretch !important;
-}
-
-.repo-btn {
-  height: 100% !important;
-  box-sizing: border-box !important;
-  align-items: center !important;
-  position: relative !important;
-  padding-right: 32px !important;
-}
-
-.repo-arrow {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 13px;
-  color: #586f8f;
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.repo-btn:hover .repo-arrow {
-  color: lightskyblue;
-  transform: translateY(-50%) translateX(3px);
 }
 
 @keyframes spin-ring {
@@ -492,27 +441,33 @@ onUnmounted(() => {
   .above-fold {
     padding: 32px 20px 16px;
   }
+
   .name-title {
     font-size: clamp(30px, 8vw, 44px);
   }
+
   .avatar-img {
     width: 110px;
     height: 110px;
   }
+
   .ring-1 {
     width: 128px;
     height: 128px;
   }
+
   .ring-2 {
     width: 145px;
     height: 145px;
   }
+
   .avatar-wrap {
     width: 160px;
     height: 160px;
   }
-  .repo-button-grid {
-    grid-template-columns: 1fr !important;
+
+  .about-section .repo-button-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>
