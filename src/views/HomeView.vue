@@ -46,6 +46,8 @@ onUnmounted(() => {
           src="https://raw.githubusercontent.com/jones8683/jones8683/output/github-contribution-grid-snake-dark.svg"
           alt="GitHub contribution snake"
           class="snake-image"
+          fetchpriority="high"
+          decoding="async"
         />
       </div>
 
@@ -151,6 +153,8 @@ onUnmounted(() => {
                 src="https://github.com/BetterSEQTA.png"
                 alt=""
                 class="repo-logo"
+                loading="lazy"
+                decoding="async"
               />
               <div class="repo-info">
                 <span class="repo-btn-name">BetterSEQTA+</span>
@@ -169,6 +173,8 @@ onUnmounted(() => {
                 src="https://github.com/BetterSEQTA.png"
                 alt=""
                 class="repo-logo"
+                loading="lazy"
+                decoding="async"
               />
               <div class="repo-info">
                 <span class="repo-btn-name">DesQTA</span>
@@ -187,6 +193,8 @@ onUnmounted(() => {
                 src="https://github.com/Jones8683.png"
                 alt=""
                 class="repo-logo"
+                loading="lazy"
+                decoding="async"
               />
               <div class="repo-info">
                 <span class="repo-btn-name">Portfolio Site</span>
@@ -206,6 +214,8 @@ onUnmounted(() => {
                 src="https://github.com/Jones8683.png"
                 alt=""
                 class="repo-logo"
+                loading="lazy"
+                decoding="async"
               />
               <div class="repo-info">
                 <span class="repo-btn-name">Arduino Buzzer Music</span>
