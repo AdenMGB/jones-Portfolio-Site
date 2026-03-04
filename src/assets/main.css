@@ -1,4 +1,4 @@
-/* ── Reset & Base ─────────────────────────────────── */
+/* Reset & Base */
 
 * {
   margin: 0;
@@ -62,7 +62,7 @@ body {
   flex-direction: column;
 }
 
-/* ── Background Gradient ─────────────────────────── */
+/* Background Gradient */
 
 html::before {
   content: "";
@@ -84,7 +84,7 @@ html::before {
   background-attachment: fixed;
 }
 
-/* ── Header & Navigation ─────────────────────────── */
+/* Header & Navigation */
 
 .main-header {
   position: fixed;
@@ -272,7 +272,7 @@ html::before {
   }
 }
 
-/* ── Main Layout ─────────────────────────────────── */
+/* Main Layout */
 
 main {
   flex: 1;
@@ -287,7 +287,7 @@ main:not(.home-page) {
   padding-top: 130px;
 }
 
-/* ── Shared Page Elements ────────────────────────── */
+/* Shared Page Elements */
 
 .content-wrap {
   width: min(90%, 800px);
@@ -337,7 +337,7 @@ a.repo-link:hover {
   text-decoration: underline;
 }
 
-/* ── About Sections ──────────────────────────────── */
+/* About Sections */
 
 .about-section {
   width: 100%;
@@ -483,7 +483,7 @@ a.repo-link:hover {
   }
 }
 
-/* ── Footer ──────────────────────────────────────── */
+/* Footer */
 
 .main-footer {
   width: 100%;
@@ -508,7 +508,7 @@ a.repo-link:hover {
   letter-spacing: 0.5px;
 }
 
-/* ── Mobile / Desktop Game Toggle ────────────────── */
+/* Mobile / Desktop Game Toggle */
 
 .mobile-msg {
   display: none;
