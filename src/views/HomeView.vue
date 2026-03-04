@@ -191,7 +191,7 @@ onUnmounted(() => {
               <div class="repo-info">
                 <span class="repo-btn-name">Portfolio Site</span>
                 <p class="repo-desc">
-                  This very website - ashowcase of my skills, interests, and
+                  This very website — a showcase of my skills, interests, and
                   projects
                 </p>
               </div>
