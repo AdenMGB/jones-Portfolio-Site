@@ -10,7 +10,7 @@ import { RouterLink } from "vue-router";
       A collection of modern and classic browser games.
     </p>
 
-    <div class="arcade-row-1">
+    <div class="arcade-grid">
       <div class="arcade-card">
         <div class="arcade-card-top">
           <span class="arcade-icon">🧱</span>
@@ -51,20 +51,28 @@ import { RouterLink } from "vue-router";
         </div>
         <RouterLink
           to="/arcade/stickman-hook"
-          class="arcade-card-bottom red-btn"
+          class="arcade-card-bottom yellow-btn"
         >
           Play Now
         </RouterLink>
       </div>
-    </div>
 
-    <div class="arcade-row-2">
       <div class="arcade-card">
         <div class="arcade-card-top">
           <span class="arcade-icon">🧍</span>
           <h3 class="arcade-name">Hangman</h3>
         </div>
         <RouterLink to="/arcade/hangman" class="arcade-card-bottom green-btn">
+          Play Now
+        </RouterLink>
+      </div>
+
+      <div class="arcade-card">
+        <div class="arcade-card-top">
+          <span class="arcade-icon">🔢</span>
+          <h3 class="arcade-name">2048</h3>
+        </div>
+        <RouterLink to="/arcade/2048" class="arcade-card-bottom yellow-btn">
           Play Now
         </RouterLink>
       </div>
@@ -84,10 +92,13 @@ import { RouterLink } from "vue-router";
 
       <div class="arcade-card">
         <div class="arcade-card-top">
-          <span class="arcade-icon">🔢</span>
-          <h3 class="arcade-name">2048</h3>
+          <span class="arcade-icon">🐦</span>
+          <h3 class="arcade-name">Flappy Bird</h3>
         </div>
-        <RouterLink to="/arcade/2048" class="arcade-card-bottom blue-btn">
+        <RouterLink
+          to="/arcade/flappy-bird"
+          class="arcade-card-bottom blue-btn"
+        >
           Play Now
         </RouterLink>
       </div>
@@ -102,6 +113,10 @@ import { RouterLink } from "vue-router";
   font-size: 72px;
 }
 
+.content-wrap {
+  padding-bottom: 60px;
+}
+
 .arcade-subtitle {
   color: #94a3b8;
   font-size: 1.05rem;
@@ -109,22 +124,15 @@ import { RouterLink } from "vue-router";
   font-weight: 400;
 }
 
-.arcade-row-1,
-.arcade-row-2 {
+.arcade-grid {
   display: grid;
+  grid-template-columns: repeat(4, 250px);
+  grid-template-rows: repeat(2, auto);
   gap: 21px;
   width: 100%;
   max-width: 900px;
   justify-content: center;
-  margin: 0 auto 6px auto;
-}
-
-.arcade-row-1 {
-  grid-template-columns: repeat(4, 250px);
-}
-
-.arcade-row-2 {
-  grid-template-columns: repeat(3, 250px);
+  margin: 0 auto;
 }
 
 .arcade-card {
@@ -220,9 +228,14 @@ import { RouterLink } from "vue-router";
   color: white;
 }
 
+@media (max-width: 900px) {
+  .arcade-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 600px) {
-  .arcade-row-1,
-  .arcade-row-2 {
+  .arcade-grid {
     grid-template-columns: 1fr;
   }
 }

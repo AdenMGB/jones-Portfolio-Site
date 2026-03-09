@@ -10,6 +10,7 @@ import MinecraftView from "../views/MinecraftView.vue";
 import Game2048View from "@/views/Game2048View.vue";
 import HangmanView from "@/views/HangmanView.vue";
 import NoughtsAndCrossesView from "@/views/NoughtsAndCrossesView.vue";
+import FlappyBirdView from "@/views/FlappyBirdView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -80,6 +81,12 @@ const router = createRouter({
       name: "hangman",
       component: HangmanView,
       meta: { title: "Hangman" },
+    },
+    {
+      path: "/arcade/flappy-bird",
+      name: "flappy-bird",
+      component: FlappyBirdView,
+      meta: { title: "Flappy Bird" },
     },
     {
       path: "/:pathMatch(.*)*",

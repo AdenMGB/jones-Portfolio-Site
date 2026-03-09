@@ -2,25 +2,29 @@
 import { onMounted, onUnmounted } from "vue";
 
 let canvas, ctx, animationId;
+
 const WIN_SCORE = 7;
 const PADDLE_W = 12;
 const PADDLE_H = 85;
 const BALL_R = 7;
+const TARGET_FPS = 60;
+const STEP = 1000 / TARGET_FPS;
 
 let gameMode = "cpu";
 let isPaused = false;
 let isRunning = false;
 let isResetting = false;
+let lastTs = 0;
 
 const leftPaddle = {
   x: 20,
   y: 210,
   score: 0,
-  speed: 7,
+  speed: 10,
   aiSpeed: 5.8,
   flash: 0,
 };
-const rightPaddle = { x: 668, y: 210, score: 0, speed: 7, flash: 0 };
+const rightPaddle = { x: 668, y: 210, score: 0, speed: 10, flash: 0 };
 const ball = { x: 350, y: 250, dx: 0, dy: 0, speed: 4, baseSpeed: 4 };
 
 let trail = [];
@@ -39,18 +43,18 @@ function getAudioCtx() {
 }
 
 function beep(freq, duration, type = "square", vol = 0.15) {
-  const ctx = getAudioCtx();
-  if (!ctx) return;
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
+  const ac = getAudioCtx();
+  if (!ac) return;
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
   osc.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(ac.destination);
   osc.type = type;
-  osc.frequency.setValueAtTime(freq, ctx.currentTime);
-  gain.gain.setValueAtTime(vol, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + duration);
+  osc.frequency.setValueAtTime(freq, ac.currentTime);
+  gain.gain.setValueAtTime(vol, ac.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + duration);
+  osc.start(ac.currentTime);
+  osc.stop(ac.currentTime + duration);
 }
 
 function spawnParticles(x, y, color) {
@@ -99,7 +103,9 @@ function initGame(mode) {
   isRunning = true;
   isPaused = false;
   keys.w = keys.s = keys.ArrowUp = keys.ArrowDown = false;
+  getAudioCtx();
   resetPositions();
+  lastTs = performance.now();
   gameLoop();
 }
 
@@ -128,23 +134,26 @@ function togglePause() {
   document.getElementById("pauseMsg").style.display = isPaused
     ? "flex"
     : "none";
-  if (!isPaused) gameLoop();
+  if (!isPaused) {
+    lastTs = performance.now();
+    gameLoop();
+  }
 }
 
-function update() {
+function update(dt) {
   if (isPaused) return;
 
-  if (keys.ArrowUp) rightPaddle.y -= rightPaddle.speed;
-  if (keys.ArrowDown) rightPaddle.y += rightPaddle.speed;
+  if (keys.ArrowUp) rightPaddle.y -= rightPaddle.speed * dt;
+  if (keys.ArrowDown) rightPaddle.y += rightPaddle.speed * dt;
 
   if (gameMode === "cpu") {
     const target = ball.y - PADDLE_H / 2;
     let move = (target - leftPaddle.y) * 0.18;
     move = Math.max(-leftPaddle.aiSpeed, Math.min(leftPaddle.aiSpeed, move));
-    leftPaddle.y += move;
+    leftPaddle.y += move * dt;
   } else {
-    if (keys.w) leftPaddle.y -= leftPaddle.speed;
-    if (keys.s) leftPaddle.y += leftPaddle.speed;
+    if (keys.w) leftPaddle.y -= leftPaddle.speed * dt;
+    if (keys.s) leftPaddle.y += leftPaddle.speed * dt;
   }
 
   leftPaddle.y = Math.max(0, Math.min(canvas.height - PADDLE_H, leftPaddle.y));
@@ -153,16 +162,16 @@ function update() {
     Math.min(canvas.height - PADDLE_H, rightPaddle.y),
   );
 
-  if (leftPaddle.flash > 0) leftPaddle.flash--;
-  if (rightPaddle.flash > 0) rightPaddle.flash--;
-  if (shakeFrames > 0) shakeFrames--;
+  if (leftPaddle.flash > 0) leftPaddle.flash -= dt;
+  if (rightPaddle.flash > 0) rightPaddle.flash -= dt;
+  if (shakeFrames > 0) shakeFrames -= dt;
 
   if (!isResetting) {
     trail.push({ x: ball.x, y: ball.y });
-    if (trail.length > 8) trail.shift();
+    if (trail.length > 10) trail.shift();
 
-    ball.x += ball.dx;
-    ball.y += ball.dy;
+    ball.x += ball.dx * dt;
+    ball.y += ball.dy * dt;
 
     if (ball.y - BALL_R < 0) {
       ball.y = BALL_R;
@@ -186,11 +195,9 @@ function update() {
       );
       const angle = (Math.PI / 4) * cp;
       const dir = ball.x < canvas.width / 2 ? 1 : -1;
-
       ball.speed = Math.min(ball.speed + 0.45, 16);
       ball.dx = dir * ball.speed * Math.cos(angle);
       ball.dy = ball.speed * Math.sin(angle);
-
       if (paddle === leftPaddle) {
         ball.x = leftPaddle.x + PADDLE_W + BALL_R;
         leftPaddle.flash = 8;
@@ -198,7 +205,6 @@ function update() {
         ball.x = rightPaddle.x - BALL_R;
         rightPaddle.flash = 8;
       }
-
       beep(300 + Math.abs(cp) * 100, 0.07, "square");
       shakeFrames = 6;
       shakeIntensity = 3.5;
@@ -223,11 +229,11 @@ function update() {
 
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vx *= 0.92;
-    p.vy *= 0.92;
-    p.life -= p.decay;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.vx *= Math.pow(0.92, dt);
+    p.vy *= Math.pow(0.92, dt);
+    p.life -= p.decay * dt;
     if (p.life <= 0) particles.splice(i, 1);
   }
 }
@@ -271,8 +277,8 @@ function drawStatic() {
 }
 
 function drawCenterLine() {
-  const segH = 18,
-    segGap = 12;
+  const segH = 18;
+  const segGap = 12;
   const totalSegs = Math.floor(canvas.height / (segH + segGap));
   const startY = (canvas.height - totalSegs * (segH + segGap) + segGap) / 2;
   ctx.fillStyle = "rgba(255,255,255,0.07)";
@@ -299,13 +305,11 @@ function draw() {
   if (trail.length > 1) {
     for (let i = 1; i < trail.length; i++) {
       const frac = i / trail.length;
-      const alpha = frac * 0.45;
-      const width = BALL_R * 2 * frac * 0.75;
       ctx.beginPath();
       ctx.moveTo(trail[i - 1].x, trail[i - 1].y);
       ctx.lineTo(trail[i].x, trail[i].y);
-      ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
-      ctx.lineWidth = Math.max(1, width);
+      ctx.strokeStyle = `rgba(255,255,255,${frac * 0.22})`;
+      ctx.lineWidth = frac * BALL_R * 1.4;
       ctx.lineCap = "round";
       ctx.stroke();
     }
@@ -337,21 +341,20 @@ function draw() {
   drawPaddle(leftPaddle);
   drawPaddle(rightPaddle);
 
-  ctx.save();
-  ctx.shadowColor = "rgba(255,255,255,0.9)";
-  ctx.shadowBlur = isResetting ? 0 : 18;
   ctx.fillStyle = "white";
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, BALL_R, 0, Math.PI * 2);
   ctx.fill();
-  ctx.restore();
 
   ctx.restore();
 }
 
-function gameLoop() {
+function gameLoop(ts = performance.now()) {
   if (!isRunning || isPaused) return;
-  update();
+  const raw = ts - lastTs;
+  lastTs = ts;
+  const dt = Math.min(raw, 50) / STEP;
+  update(dt);
   draw();
   animationId = requestAnimationFrame(gameLoop);
 }
@@ -421,8 +424,9 @@ onUnmounted(() => {
             color: lightskyblue;
             text-decoration: none;
           "
-          >← Back to arcade</RouterLink
         >
+          ← Back to arcade
+        </RouterLink>
       </div>
     </div>
 
@@ -453,6 +457,7 @@ onUnmounted(() => {
             <h2 class="menu-title">PAUSED</h2>
           </div>
         </div>
+
         <div class="right-section">
           <h1 class="game-title">Pong</h1>
           <div class="info-box score-box">
@@ -469,7 +474,8 @@ onUnmounted(() => {
               <div><span class="key">↑</span> <span class="key">↓</span></div>
             </div>
             <div class="control-item">
-              <span>Pause</span> <span class="key">ESC</span>
+              <span>Pause</span>
+              <span class="key">ESC</span>
             </div>
           </div>
         </div>
