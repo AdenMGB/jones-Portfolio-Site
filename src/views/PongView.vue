@@ -140,9 +140,7 @@ function togglePause() {
   }
 }
 
-function update(dt) {
-  if (isPaused) return;
-
+function updatePaddles(dt) {
   if (keys.ArrowUp) rightPaddle.y -= rightPaddle.speed * dt;
   if (keys.ArrowDown) rightPaddle.y += rightPaddle.speed * dt;
 
@@ -161,6 +159,83 @@ function update(dt) {
     0,
     Math.min(canvas.height - PADDLE_H, rightPaddle.y),
   );
+}
+
+function updateBallWallCollision() {
+  if (ball.y - BALL_R < 0) {
+    ball.y = BALL_R;
+    ball.dy *= -1;
+    beep(220, 0.07);
+    shakeFrames = 4;
+    shakeIntensity = 2;
+  } else if (ball.y + BALL_R > canvas.height) {
+    ball.y = canvas.height - BALL_R;
+    ball.dy *= -1;
+    beep(220, 0.07);
+    shakeFrames = 4;
+    shakeIntensity = 2;
+  }
+}
+
+function updateBallPaddleCollision() {
+  const paddle = ball.x < canvas.width / 2 ? leftPaddle : rightPaddle;
+  if (!collision(ball, paddle)) return;
+
+  const cp = Math.max(
+    -1,
+    Math.min(1, (ball.y - (paddle.y + PADDLE_H / 2)) / (PADDLE_H / 2)),
+  );
+  const angle = (Math.PI / 4) * cp;
+  const dir = ball.x < canvas.width / 2 ? 1 : -1;
+  ball.speed = Math.min(ball.speed + 0.45, 16);
+  ball.dx = dir * ball.speed * Math.cos(angle);
+  ball.dy = ball.speed * Math.sin(angle);
+  if (paddle === leftPaddle) {
+    ball.x = leftPaddle.x + PADDLE_W + BALL_R;
+    leftPaddle.flash = 8;
+  } else {
+    ball.x = rightPaddle.x - BALL_R;
+    rightPaddle.flash = 8;
+  }
+  beep(300 + Math.abs(cp) * 100, 0.07, "square");
+  shakeFrames = 6;
+  shakeIntensity = 3.5;
+}
+
+function updateBallScoring() {
+  if (ball.x < 0) {
+    spawnParticles(0, ball.y, "rgba(255,100,100,0.9)");
+    rightPaddle.score++;
+    beep(140, 0.35, "sawtooth", 0.2);
+    shakeFrames = 14;
+    shakeIntensity = 7;
+    scoreUpdate();
+  } else if (ball.x > canvas.width) {
+    spawnParticles(canvas.width, ball.y, "rgba(100,200,255,0.9)");
+    leftPaddle.score++;
+    beep(140, 0.35, "sawtooth", 0.2);
+    shakeFrames = 14;
+    shakeIntensity = 7;
+    scoreUpdate();
+  }
+}
+
+function updateParticles(dt) {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.vx *= Math.pow(0.92, dt);
+    p.vy *= Math.pow(0.92, dt);
+    p.life -= p.decay * dt;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+}
+
+function update(dt) {
+  if (isPaused) return;
+
+  updatePaddles(dt);
 
   if (leftPaddle.flash > 0) leftPaddle.flash -= dt;
   if (rightPaddle.flash > 0) rightPaddle.flash -= dt;
@@ -173,69 +248,12 @@ function update(dt) {
     ball.x += ball.dx * dt;
     ball.y += ball.dy * dt;
 
-    if (ball.y - BALL_R < 0) {
-      ball.y = BALL_R;
-      ball.dy *= -1;
-      beep(220, 0.07);
-      shakeFrames = 4;
-      shakeIntensity = 2;
-    } else if (ball.y + BALL_R > canvas.height) {
-      ball.y = canvas.height - BALL_R;
-      ball.dy *= -1;
-      beep(220, 0.07);
-      shakeFrames = 4;
-      shakeIntensity = 2;
-    }
-
-    const paddle = ball.x < canvas.width / 2 ? leftPaddle : rightPaddle;
-    if (collision(ball, paddle)) {
-      const cp = Math.max(
-        -1,
-        Math.min(1, (ball.y - (paddle.y + PADDLE_H / 2)) / (PADDLE_H / 2)),
-      );
-      const angle = (Math.PI / 4) * cp;
-      const dir = ball.x < canvas.width / 2 ? 1 : -1;
-      ball.speed = Math.min(ball.speed + 0.45, 16);
-      ball.dx = dir * ball.speed * Math.cos(angle);
-      ball.dy = ball.speed * Math.sin(angle);
-      if (paddle === leftPaddle) {
-        ball.x = leftPaddle.x + PADDLE_W + BALL_R;
-        leftPaddle.flash = 8;
-      } else {
-        ball.x = rightPaddle.x - BALL_R;
-        rightPaddle.flash = 8;
-      }
-      beep(300 + Math.abs(cp) * 100, 0.07, "square");
-      shakeFrames = 6;
-      shakeIntensity = 3.5;
-    }
-
-    if (ball.x < 0) {
-      spawnParticles(0, ball.y, "rgba(255,100,100,0.9)");
-      rightPaddle.score++;
-      beep(140, 0.35, "sawtooth", 0.2);
-      shakeFrames = 14;
-      shakeIntensity = 7;
-      scoreUpdate();
-    } else if (ball.x > canvas.width) {
-      spawnParticles(canvas.width, ball.y, "rgba(100,200,255,0.9)");
-      leftPaddle.score++;
-      beep(140, 0.35, "sawtooth", 0.2);
-      shakeFrames = 14;
-      shakeIntensity = 7;
-      scoreUpdate();
-    }
+    updateBallWallCollision();
+    updateBallPaddleCollision();
+    updateBallScoring();
   }
 
-  for (let i = particles.length - 1; i >= 0; i--) {
-    const p = particles[i];
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-    p.vx *= Math.pow(0.92, dt);
-    p.vy *= Math.pow(0.92, dt);
-    p.life -= p.decay * dt;
-    if (p.life <= 0) particles.splice(i, 1);
-  }
+  updateParticles(dt);
 }
 
 function scoreUpdate() {
