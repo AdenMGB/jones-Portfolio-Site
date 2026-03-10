@@ -188,7 +188,7 @@ onUnmounted(() => {
 
 .game-title {
   font-size: 72px;
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
   letter-spacing: -4px;
   font-weight: 900;
   color: white;
