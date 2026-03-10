@@ -343,8 +343,7 @@ onUnmounted(() => {
 .ring-2 {
   width: 185px;
   height: 185px;
-  border-color: rgba(21, 224, 214, 0.15) rgba(21, 224, 214, 0.04)
-    rgba(21, 224, 214, 0.15) rgba(21, 224, 214, 0.04);
+  border-color: rgba(21, 224, 214, 0.15) rgba(21, 224, 214, 0.04);
   animation-duration: 14s;
   animation-direction: reverse;
 }

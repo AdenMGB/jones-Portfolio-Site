@@ -381,7 +381,7 @@ const gridStyle = computed(() => ({
 }
 .game-title {
   font-size: 48px;
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
   letter-spacing: -2px;
   font-weight: 900;
   color: white;

@@ -767,7 +767,7 @@ onUnmounted(() => {
         <div class="left-section">
           <canvas id="gameCanvas" width="300" height="500"></canvas>
           <div id="gameOverMsg" class="overlay-msg" style="display: none">
-            <h2 style="font-size: 24px; color: white; margin: 0 0 10px 0">
+            <h2 style="font-size: 24px; color: white; margin: 0 0 10px">
               GAME OVER
             </h2>
             <button @click="resetGame" class="retry-btn">RETRY</button>
@@ -904,7 +904,7 @@ onUnmounted(() => {
 }
 .game-title {
   font-size: 72px;
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
   letter-spacing: -4px;
   font-weight: 900;
   color: white;

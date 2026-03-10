@@ -151,7 +151,7 @@ onUnmounted(() => {
           </div>
 
           <div v-if="winner || isDraw" class="overlay-msg">
-            <h2 style="font-size: 24px; color: white; margin: 0 0 10px 0">
+            <h2 style="font-size: 24px; color: white; margin: 0 0 10px">
               <span v-if="winner">PLAYER {{ winner }} WINS!</span>
               <span v-else>DRAW!</span>
             </h2>
@@ -337,7 +337,7 @@ onUnmounted(() => {
 
 .game-title {
   font-size: 48px;
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
   letter-spacing: -2px;
   font-weight: 900;
   color: white;
