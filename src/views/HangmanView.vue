@@ -111,7 +111,7 @@ const bodyVisible = computed(() => ({
                   @input="onInput"
                   class="word-input"
                   type="text"
-                  maxlength="24"
+                  maxlength="30"
                   placeholder="TYPE A WORD OR PHRASE..."
                   @keydown.enter="submitWord"
                   autocomplete="off"
@@ -125,7 +125,7 @@ const bodyVisible = computed(() => ({
                   Set Word →
                 </button>
               </div>
-              <p class="hint-text">Letters and spaces only · max 24 chars</p>
+              <p class="hint-text">Letters and spaces only · max 30 chars</p>
             </template>
 
             <template v-else>
