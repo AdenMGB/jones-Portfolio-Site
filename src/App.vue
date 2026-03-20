@@ -39,7 +39,7 @@ onUnmounted(() => {
           <span class="nav-name">Jones Jankovic</span>
         </RouterLink>
         <div class="glass-nav">
-          <RouterLink to="/arcade" class="glass-btn">Arcade</RouterLink>
+          <RouterLink to="/play" class="glass-btn">Arcade</RouterLink>
           <RouterLink to="/minecraft" class="glass-btn">Minecraft</RouterLink>
         </div>
       </div>
