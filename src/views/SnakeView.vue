@@ -4,7 +4,7 @@ import { useStorage } from "@vueuse/core";
 import GameMobileMessage from "../components/GameMobileMessage.vue";
 
 const GRID = 20;
-const CELL = 16;
+const CELL = 22;
 const CANVAS = GRID * CELL;
 const MAX_FRAME_MS = 50;
 
@@ -27,7 +27,8 @@ let alpha = 1;
 let snake = [];
 let snakeBefore = [];
 let dir = { dx: 1, dy: 0 };
-let pendingDir = null;
+/** Buffered turns (max 2) so rapid keypresses are not lost between ticks */
+let dirQueue = [];
 let food = { x: 0, y: 0 };
 
 function randInt(max) {
@@ -56,7 +57,7 @@ function resetPlaying() {
     { x: 8, y: 10 },
   ];
   dir = { dx: 1, dy: 0 };
-  pendingDir = null;
+  dirQueue = [];
   spawnFood();
   scoreRef.value = 0;
   tickMs = 130;
@@ -68,20 +69,32 @@ function resetPlaying() {
   phase.value = "playing";
 }
 
-function trySetDir(dx, dy) {
+function enqueueDir(ndx, ndy) {
   if (phase.value !== "playing") return;
-  if (dx === -dir.dx && dy === -dir.dy) return;
-  pendingDir = { dx, dy };
+  let rdx = dir.dx;
+  let rdy = dir.dy;
+  if (dirQueue.length > 0) {
+    const last = dirQueue[dirQueue.length - 1];
+    rdx = last.dx;
+    rdy = last.dy;
+  }
+  if (ndx === -rdx && ndy === -rdy) return;
+  if (ndx === rdx && ndy === rdy) return;
+  if (dirQueue.length < 2) {
+    dirQueue.push({ dx: ndx, dy: ndy });
+  } else {
+    dirQueue[1] = { dx: ndx, dy: ndy };
+  }
 }
 
 function step() {
   snakeBefore = snake.map((s) => ({ x: s.x, y: s.y }));
 
-  if (pendingDir) {
-    if (!(pendingDir.dx === -dir.dx && pendingDir.dy === -dir.dy)) {
-      dir = pendingDir;
+  if (dirQueue.length > 0) {
+    const next = dirQueue.shift();
+    if (!(next.dx === -dir.dx && next.dy === -dir.dy)) {
+      dir = next;
     }
-    pendingDir = null;
   }
 
   const head = snake[0];
@@ -408,6 +421,17 @@ function setupCanvas() {
 }
 
 function handleKeydown(e) {
+  if (e.code === "Escape") {
+    e.preventDefault();
+    if (phase.value === "playing") {
+      phase.value = "paused";
+    } else if (phase.value === "paused") {
+      phase.value = "playing";
+      lastTs = 0;
+    }
+    return;
+  }
+
   if (e.code === "Space") {
     e.preventDefault();
     if (phase.value === "playing") {
@@ -419,7 +443,8 @@ function handleKeydown(e) {
     return;
   }
 
-  if (e.key.toLowerCase() === "r") {
+  if (e.code === "KeyR" || e.key?.toLowerCase() === "r") {
+    e.preventDefault();
     if (phase.value === "gameover" || phase.value === "paused") {
       resetPlaying();
     }
@@ -433,30 +458,42 @@ function handleKeydown(e) {
 
   if (phase.value !== "playing") return;
 
-  switch (e.key) {
+  if (
+    e.code === "ArrowUp" ||
+    e.code === "ArrowDown" ||
+    e.code === "ArrowLeft" ||
+    e.code === "ArrowRight"
+  ) {
+    e.preventDefault();
+  }
+
+  switch (e.code) {
     case "ArrowUp":
-      e.preventDefault();
-      trySetDir(0, -1);
+      enqueueDir(0, -1);
       break;
     case "ArrowDown":
-      e.preventDefault();
-      trySetDir(0, 1);
+      enqueueDir(0, 1);
       break;
     case "ArrowLeft":
-      e.preventDefault();
-      trySetDir(-1, 0);
+      enqueueDir(-1, 0);
       break;
     case "ArrowRight":
-      e.preventDefault();
-      trySetDir(1, 0);
+      enqueueDir(1, 0);
       break;
-    default: {
-      const k = e.key.toLowerCase();
-      if (k === "w") trySetDir(0, -1);
-      else if (k === "s") trySetDir(0, 1);
-      else if (k === "a") trySetDir(-1, 0);
-      else if (k === "d") trySetDir(1, 0);
-    }
+    case "KeyW":
+      enqueueDir(0, -1);
+      break;
+    case "KeyS":
+      enqueueDir(0, 1);
+      break;
+    case "KeyA":
+      enqueueDir(-1, 0);
+      break;
+    case "KeyD":
+      enqueueDir(1, 0);
+      break;
+    default:
+      break;
   }
 }
 
@@ -495,8 +532,8 @@ function resumeGame() {
             <canvas
               ref="canvasRef"
               class="game-canvas"
-              width="320"
-              height="320"
+              width="440"
+              height="440"
               aria-label="Snake game board"
             />
           </div>
@@ -505,15 +542,19 @@ function resumeGame() {
         <div class="right-section">
           <h1 class="game-title">Snake</h1>
 
-          <div class="row">
-            <div class="info-box score-box">
-              <div class="label score-label">Score</div>
-              <div class="value score-value">{{ scoreRef }}</div>
+          <div class="info-box score-box">
+            <div class="label score-label">Score</div>
+            <div class="value score-value">{{ scoreRef }}</div>
+
+            <div class="score-divider"></div>
+
+            <div
+              class="label"
+              style="font-size: 11px; color: #94a3b8; margin-bottom: 2px"
+            >
+              HIGH SCORE
             </div>
-            <div class="info-box score-box best-box">
-              <div class="label score-label gold">Best</div>
-              <div class="value score-value gold">{{ highScore }}</div>
-            </div>
+            <div class="value high-score-value">{{ highScore }}</div>
           </div>
 
           <p v-if="isNewBest && phase === 'gameover'" class="new-best">
@@ -554,7 +595,7 @@ function resumeGame() {
             </div>
             <div class="control-item">
               <span>Pause</span>
-              <span class="key">Space</span>
+              <span class="key">Space · Esc</span>
             </div>
             <div class="control-item">
               <span>Restart</span>
@@ -608,23 +649,17 @@ function resumeGame() {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  width: 260px;
+  width: 240px;
   text-align: left;
 }
 
 .game-title {
-  font-size: 52px;
-  margin: 0 0 6px;
-  letter-spacing: -2px;
+  font-size: 72px;
+  margin: 0 0 10px;
+  letter-spacing: -4px;
   font-weight: 900;
   color: white;
   line-height: 1;
-}
-
-.row {
-  display: flex;
-  gap: 15px;
-  width: 100%;
 }
 
 .info-box {
@@ -636,26 +671,26 @@ function resumeGame() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex: 1;
-  min-height: 88px;
 }
 
 .score-box {
+  aspect-ratio: auto;
+  min-height: 120px;
+  width: 100%;
   background: linear-gradient(
     135deg,
-    rgba(46, 213, 115, 0.08),
-    rgba(46, 213, 115, 0.02)
+    rgba(255, 215, 0, 0.05),
+    rgba(255, 215, 0, 0.01)
   );
-  border: 1px solid rgba(46, 213, 115, 0.25);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-.best-box {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 215, 0, 0.06),
-    rgba(255, 215, 0, 0.02)
-  );
-  border: 1px solid rgba(255, 215, 0, 0.28);
+.score-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
 }
 
 .label {
@@ -663,32 +698,35 @@ function resumeGame() {
   color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   width: 100%;
   text-align: center;
   font-weight: 700;
 }
 
-.score-label.gold,
-.label.gold {
+.score-label {
   color: #ffd700;
+  margin-bottom: 4px;
 }
 
 .value {
-  font-size: 32px;
+  font-size: 20px;
   font-weight: 900;
   color: white;
+  word-break: break-all;
   line-height: 1;
 }
 
 .score-value {
-  color: #2ed573;
-  text-shadow: 0 0 12px rgba(46, 213, 115, 0.25);
+  font-size: 42px;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
 }
 
-.score-value.gold {
+.high-score-value {
+  font-size: 24px;
   color: #ffd700;
-  text-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
 }
 
 .new-best {

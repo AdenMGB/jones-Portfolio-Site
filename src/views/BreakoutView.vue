@@ -3,19 +3,20 @@ import { ref, onMounted, onUnmounted } from "vue";
 import { useStorage } from "@vueuse/core";
 import GameMobileMessage from "../components/GameMobileMessage.vue";
 
-const W = 360;
-const H = 420;
-const PADDLE_W = 76;
+const W = 380;
+const H = 500;
+const PADDLE_W = 80;
 const PADDLE_H = 11;
-const PADDLE_Y = H - 40;
+const PADDLE_Y = H - 42;
 const BALL_R = 6;
-const BRICK_ROWS = 5;
-const BRICK_COLS = 8;
-const BRICK_TOP = 52;
-const BRICK_GAP = 5;
-const BRICK_H = 18;
+const BRICK_ROWS = 9;
+const BRICK_COLS = 11;
+const BRICK_TOP = 44;
+const BRICK_GAP = 4;
+const BRICK_H = 15;
 const MAX_DT = 50;
-const BASE_SPEED = 4.2;
+const BASE_SPEED = 5.6;
+const MAX_SPEED = 14;
 
 const highScore = useStorage("breakout-high-score", 0);
 
@@ -55,7 +56,7 @@ function pathRoundRect(c, x, y, w, h, r) {
 }
 
 function marginX() {
-  return 18;
+  return 16;
 }
 
 function brickWidth() {
@@ -210,7 +211,7 @@ function update(dt) {
     b.alive = false;
     scoreRef.value += 10;
     spawnParticles(b.x + b.w / 2, b.y + b.h / 2, b.hue);
-    speed = Math.min(8.5, speed + 0.06);
+    speed = Math.min(MAX_SPEED, speed + 0.12);
 
     if (Math.abs(ddx) > Math.abs(ddy)) ball.dx *= -1;
     else ball.dy *= -1;
@@ -403,6 +404,17 @@ function setupCanvas() {
 }
 
 function onKeyDown(e) {
+  if (e.code === "Escape") {
+    e.preventDefault();
+    if (phase.value === "playing") {
+      phase.value = "paused";
+    } else if (phase.value === "paused") {
+      phase.value = "playing";
+      lastTs = 0;
+    }
+    return;
+  }
+
   if (e.code === "Space") {
     e.preventDefault();
     if (phase.value === "idle") {
@@ -421,8 +433,15 @@ function onKeyDown(e) {
     return;
   }
 
-  if (e.key.toLowerCase() === "r") {
-    if (phase.value === "gameover" || phase.value === "win") {
+  if (e.code === "KeyR" || e.key?.toLowerCase() === "r") {
+    e.preventDefault();
+    if (
+      phase.value === "idle" ||
+      phase.value === "gameover" ||
+      phase.value === "win" ||
+      phase.value === "paused" ||
+      phase.value === "playing"
+    ) {
       resetPlaying();
     }
     return;
@@ -494,8 +513,8 @@ onUnmounted(() => {
             <canvas
               ref="canvasRef"
               class="game-canvas"
-              width="360"
-              height="420"
+              width="380"
+              height="500"
               aria-label="Breakout game"
             />
           </div>
@@ -504,19 +523,26 @@ onUnmounted(() => {
         <div class="right-section">
           <h1 class="game-title">Breakout</h1>
 
-          <div class="row trio">
-            <div class="info-box score-box">
-              <div class="label score-label">Score</div>
-              <div class="value score-value">{{ scoreRef }}</div>
-            </div>
-            <div class="info-box lives-box">
-              <div class="label">Lives</div>
+          <div class="info-box score-box">
+            <div class="label score-label">Score</div>
+            <div class="value score-value">{{ scoreRef }}</div>
+
+            <div class="score-divider"></div>
+
+            <div class="lives-sandwich">
+              <div class="label lives-label">Lives</div>
               <div class="value lives-value">{{ livesRef }}</div>
             </div>
-            <div class="info-box best-box">
-              <div class="label score-label gold">Best</div>
-              <div class="value score-value gold">{{ highScore }}</div>
+
+            <div class="score-divider"></div>
+
+            <div
+              class="label"
+              style="font-size: 11px; color: #94a3b8; margin-bottom: 2px"
+            >
+              HIGH SCORE
             </div>
+            <div class="value high-score-value">{{ highScore }}</div>
           </div>
 
           <p v-if="isNewBest && (phase === 'gameover' || phase === 'win')" class="new-best">
@@ -563,7 +589,7 @@ onUnmounted(() => {
             </div>
             <div class="control-item">
               <span>Launch / Pause</span>
-              <span class="key">Space</span>
+              <span class="key">Space · Esc</span>
             </div>
             <div class="control-item">
               <span>Restart</span>
@@ -618,28 +644,17 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  width: 280px;
+  width: 240px;
   text-align: left;
 }
 
 .game-title {
-  font-size: 48px;
-  margin: 0 0 6px;
-  letter-spacing: -2px;
+  font-size: 72px;
+  margin: 0 0 10px;
+  letter-spacing: -4px;
   font-weight: 900;
   color: white;
   line-height: 1;
-}
-
-.row {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-}
-
-.row.trio .info-box {
-  min-height: 76px;
-  padding: 8px 6px;
 }
 
 .info-box {
@@ -651,71 +666,99 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex: 1;
 }
 
 .score-box {
+  aspect-ratio: auto;
+  min-height: 120px;
+  width: 100%;
   background: linear-gradient(
     135deg,
-    rgba(0, 162, 255, 0.1),
-    rgba(0, 162, 255, 0.02)
+    rgba(255, 215, 0, 0.05),
+    rgba(255, 215, 0, 0.01)
   );
-  border: 1px solid rgba(0, 162, 255, 0.28);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-.lives-box {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 107, 107, 0.08),
-    rgba(255, 107, 107, 0.02)
-  );
-  border: 1px solid rgba(255, 107, 107, 0.22);
+.score-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
 }
 
-.best-box {
+.lives-sandwich {
+  align-self: stretch;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
   background: linear-gradient(
     135deg,
-    rgba(255, 215, 0, 0.06),
-    rgba(255, 215, 0, 0.02)
+    rgba(255, 80, 80, 0.12),
+    rgba(180, 40, 40, 0.06)
   );
-  border: 1px solid rgba(255, 215, 0, 0.28);
+  border: 1px solid rgba(255, 100, 100, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .label {
-  font-size: 9px;
+  font-size: 10px;
   color: #94a3b8;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
   width: 100%;
   text-align: center;
   font-weight: 700;
 }
 
-.score-label.gold {
+.score-label {
   color: #ffd700;
+  margin-bottom: 4px;
+}
+
+.lives-label {
+  color: #ff8a8a;
+  margin-bottom: 4px;
+  width: 100%;
+  text-align: center;
 }
 
 .value {
-  font-size: 26px;
+  font-size: 20px;
   font-weight: 900;
   color: white;
+  word-break: break-all;
   line-height: 1;
 }
 
 .score-value {
-  color: #00a2ff;
-  text-shadow: 0 0 10px rgba(0, 162, 255, 0.2);
+  font-size: 42px;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
 }
 
 .lives-value {
-  color: #ff6b6b;
-  text-shadow: 0 0 10px rgba(255, 107, 107, 0.2);
+  display: block;
+  width: 100%;
+  font-size: 36px;
+  font-variant-numeric: tabular-nums;
+  color: #ff5c5c;
+  text-shadow: 0 0 14px rgba(255, 80, 80, 0.45);
+  text-align: center;
+  line-height: 1.1;
 }
 
-.score-value.gold {
+.high-score-value {
+  font-size: 24px;
   color: #ffd700;
-  text-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
 }
 
 .new-best {
