@@ -99,6 +99,26 @@ import { RouterLink } from "vue-router";
 
       <div class="arcade-card">
         <div class="arcade-card-top">
+          <span class="arcade-icon">🎾</span>
+          <h3 class="arcade-name">Breakout</h3>
+        </div>
+        <RouterLink to="/play/breakout" class="arcade-card-bottom red-btn">
+          Play Now
+        </RouterLink>
+      </div>
+
+      <div class="arcade-card">
+        <div class="arcade-card-top">
+          <span class="arcade-icon">🦆</span>
+          <h3 class="arcade-name">Duck Hunt</h3>
+        </div>
+        <RouterLink to="/play/duck-hunt" class="arcade-card-bottom blue-btn">
+          Play Now
+        </RouterLink>
+      </div>
+
+      <div class="arcade-card">
+        <div class="arcade-card-top">
           <span class="arcade-icon">🐍</span>
           <h3 class="arcade-name">Snake</h3>
         </div>
@@ -109,20 +129,10 @@ import { RouterLink } from "vue-router";
 
       <div class="arcade-card">
         <div class="arcade-card-top">
-          <span class="arcade-icon">🎾</span>
-          <h3 class="arcade-name">Breakout</h3>
+          <span class="arcade-icon">🟡</span>
+          <h3 class="arcade-name">Connect 4</h3>
         </div>
-        <RouterLink to="/play/breakout" class="arcade-card-bottom blue-btn">
-          Play Now
-        </RouterLink>
-      </div>
-
-      <div class="arcade-card">
-        <div class="arcade-card-top">
-          <span class="arcade-icon">🦆</span>
-          <h3 class="arcade-name">Duck Hunt</h3>
-        </div>
-        <RouterLink to="/play/duck-hunt" class="arcade-card-bottom yellow-btn">
+        <RouterLink to="/play/connect-4" class="arcade-card-bottom yellow-btn">
           Play Now
         </RouterLink>
       </div>
