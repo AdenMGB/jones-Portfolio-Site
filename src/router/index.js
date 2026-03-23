@@ -11,6 +11,7 @@ import Game2048View from "@/views/Game2048View.vue";
 import HangmanView from "@/views/HangmanView.vue";
 import NoughtsAndCrossesView from "@/views/NoughtsAndCrossesView.vue";
 import FlappyBirdView from "@/views/FlappyBirdView.vue";
+import SnakeView from "@/views/SnakeView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -87,6 +88,12 @@ const router = createRouter({
       name: "flappy-bird",
       component: FlappyBirdView,
       meta: { title: "Flappy Bird" },
+    },
+    {
+      path: "/play/snake",
+      name: "snake",
+      component: SnakeView,
+      meta: { title: "Snake" },
     },
     {
       path: "/:pathMatch(.*)*",

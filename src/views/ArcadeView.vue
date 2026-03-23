@@ -96,6 +96,16 @@ import { RouterLink } from "vue-router";
           Play Now
         </RouterLink>
       </div>
+
+      <div class="arcade-card">
+        <div class="arcade-card-top">
+          <span class="arcade-icon">🐍</span>
+          <h3 class="arcade-name">Snake</h3>
+        </div>
+        <RouterLink to="/play/snake" class="arcade-card-bottom green-btn">
+          Play Now
+        </RouterLink>
+      </div>
     </div>
   </div>
 </template>
