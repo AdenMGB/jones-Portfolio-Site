@@ -6,6 +6,7 @@ import vue from "@vitejs/plugin-vue";
 export default defineConfig({
   plugins: [vueDevTools(), vue()],
   css: {
+    transformer: "lightningcss",
     lightningcss: {
       targets: {
         chrome: 112 << 16,
