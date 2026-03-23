@@ -2,78 +2,123 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import GameMobileMessage from "../components/GameMobileMessage.vue";
 
-const board = ref(Array(9).fill(null));
-const currentPlayer = ref("X");
+const ROWS = 6;
+const COLS = 7;
+
+const createBoard = () =>
+  Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+
+const board = ref(createBoard());
+const currentPlayer = ref(1);
 const winner = ref(null);
 const isDraw = ref(false);
+const winningCells = ref([]);
+const hoveredCol = ref(null);
+const scores = ref({ 1: 0, 2: 0 });
+const droppingCell = ref(null);
 
-const scores = ref({ X: 0, O: 0 });
+const playerColors = { 1: "#0dc2ff", 2: "#ff0d72" };
 
-const winningCombos = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6],
-];
+const makeMove = (col) => {
+  if (winner.value || isDraw.value) return;
 
-const makeMove = (index) => {
-  if (board.value[index] || winner.value) return;
-
-  board.value[index] = currentPlayer.value;
-
-  if (document.activeElement instanceof HTMLElement) {
-    document.activeElement.blur();
+  let row = -1;
+  for (let r = ROWS - 1; r >= 0; r--) {
+    if (!board.value[r][col]) {
+      row = r;
+      break;
+    }
   }
+  if (row === -1) return;
 
-  if (checkWinner()) {
+  droppingCell.value = { row, col };
+  board.value[row][col] = currentPlayer.value;
+
+  setTimeout(() => {
+    droppingCell.value = null;
+  }, 200);
+
+  const win = checkWinner(row, col);
+  if (win) {
     winner.value = currentPlayer.value;
+    winningCells.value = win;
     scores.value[currentPlayer.value]++;
-  } else if (board.value.every((cell) => cell !== null)) {
+  } else if (board.value[0].every((cell) => cell !== null)) {
     isDraw.value = true;
   } else {
-    currentPlayer.value = currentPlayer.value === "X" ? "O" : "X";
+    currentPlayer.value = currentPlayer.value === 1 ? 2 : 1;
   }
 };
 
-const checkWinner = () => {
-  return winningCombos.some((combo) => {
-    const [a, b, c] = combo;
-    return (
-      board.value[a] &&
-      board.value[a] === board.value[b] &&
-      board.value[a] === board.value[c]
-    );
-  });
+const checkWinner = (row, col) => {
+  const player = board.value[row][col];
+  const directions = [
+    [0, 1],
+    [1, 0],
+    [1, 1],
+    [1, -1],
+  ];
+
+  for (const [dr, dc] of directions) {
+    const cells = [[row, col]];
+
+    for (let i = 1; i < 4; i++) {
+      const r = row + dr * i,
+        c = col + dc * i;
+      if (
+        r >= 0 &&
+        r < ROWS &&
+        c >= 0 &&
+        c < COLS &&
+        board.value[r][c] === player
+      )
+        cells.push([r, c]);
+      else break;
+    }
+    for (let i = 1; i < 4; i++) {
+      const r = row - dr * i,
+        c = col - dc * i;
+      if (
+        r >= 0 &&
+        r < ROWS &&
+        c >= 0 &&
+        c < COLS &&
+        board.value[r][c] === player
+      )
+        cells.push([r, c]);
+      else break;
+    }
+
+    if (cells.length >= 4) return cells;
+  }
+  return null;
 };
+
+const isWinningCell = (r, c) =>
+  winningCells.value.some(([wr, wc]) => wr === r && wc === c);
+
+const isDroppingCell = (r, c) =>
+  droppingCell.value?.row === r && droppingCell.value?.col === c;
+
+const isColFull = (col) => board.value[0][col] !== null;
 
 const resetGame = () => {
-  board.value = Array(9).fill(null);
-  currentPlayer.value = "X";
+  board.value = createBoard();
+  currentPlayer.value = 1;
   winner.value = null;
   isDraw.value = false;
-
-  if (document.activeElement instanceof HTMLElement) {
+  winningCells.value = [];
+  droppingCell.value = null;
+  if (document.activeElement instanceof HTMLElement)
     document.activeElement.blur();
-  }
 };
 
-const handleKeydown = (event) => {
-  if (event.key.toLowerCase() === "r") {
-    resetGame();
-  }
+const handleKeydown = (e) => {
+  if (e.key.toLowerCase() === "r") resetGame();
 };
 
-onMounted(() => {
-  window.addEventListener("keydown", handleKeydown);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("keydown", handleKeydown);
-});
+onMounted(() => window.addEventListener("keydown", handleKeydown));
+onUnmounted(() => window.removeEventListener("keydown", handleKeydown));
 </script>
 
 <template>
@@ -84,117 +129,82 @@ onUnmounted(() => {
       <div class="game-wrapper">
         <div class="left-section">
           <div class="board">
-            <button
-              v-for="(cell, index) in board"
-              :key="index"
-              class="cell"
+            <div
+              v-for="col in COLS"
+              :key="col"
+              class="column"
               :class="{
-                'x-cell': cell === 'X',
-                'o-cell': cell === 'O',
-                disabled: cell !== null || winner !== null,
+                'col-hovered':
+                  hoveredCol === col - 1 &&
+                  !winner &&
+                  !isDraw &&
+                  !isColFull(col - 1),
               }"
-              @click="makeMove(index)"
+              @click="makeMove(col - 1)"
+              @mouseenter="hoveredCol = col - 1"
+              @mouseleave="hoveredCol = null"
             >
-              <svg
-                v-if="cell === 'X'"
-                class="mark-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="3"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-
-              <svg
-                v-if="cell === 'O'"
-                class="mark-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="3"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="12" cy="12" r="8"></circle>
-              </svg>
-            </button>
+              <div v-for="row in ROWS" :key="row" class="cell">
+                <div
+                  class="piece"
+                  :class="{
+                    p1: board[row - 1][col - 1] === 1,
+                    p2: board[row - 1][col - 1] === 2,
+                    'winning-piece': isWinningCell(row - 1, col - 1),
+                    dropping: isDroppingCell(row - 1, col - 1),
+                  }"
+                ></div>
+              </div>
+            </div>
           </div>
 
           <div v-if="winner || isDraw" class="overlay-msg">
-            <h2 style="font-size: 24px; color: white; margin: 0 0 10px">
-              <span v-if="winner">PLAYER {{ winner }} WINS!</span>
-              <span v-else>DRAW!</span>
+            <h2 style="font-size: 24px; margin: 0 0 10px">
+              <span v-if="winner" :style="{ color: playerColors[winner] }">
+                PLAYER {{ winner }} WINS!
+              </span>
+              <span v-else style="color: white">DRAW!</span>
             </h2>
             <button @click="resetGame" class="retry-btn">PLAY AGAIN</button>
           </div>
         </div>
 
         <div class="right-section">
-          <h1 class="game-title">Noughts<br />& Crosses</h1>
+          <h1 class="game-title">Connect 4</h1>
 
           <div class="row">
             <div class="info-box score-box">
               <div class="label score-label" style="color: #0dc2ff">
-                Player X
+                Player 1
               </div>
-              <div class="value score-value">{{ scores.X }}</div>
+              <div class="value score-value">{{ scores[1] }}</div>
             </div>
             <div class="info-box score-box">
               <div class="label score-label" style="color: #ff0d72">
-                Player O
+                Player 2
               </div>
-              <div class="value score-value">{{ scores.O }}</div>
+              <div class="value score-value">{{ scores[2] }}</div>
             </div>
           </div>
 
           <div class="row">
             <div class="info-box turn-box">
               <div class="label">Turn</div>
-              <div
-                class="value turn-value"
-                :class="{
-                  'x-cell': currentPlayer === 'X' && !winner && !isDraw,
-                  'o-cell': currentPlayer === 'O' && !winner && !isDraw,
-                }"
-              >
-                <svg
-                  v-if="currentPlayer === 'X' && !winner && !isDraw"
-                  class="mark-icon-small"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-                <svg
-                  v-else-if="currentPlayer === 'O' && !winner && !isDraw"
-                  class="mark-icon-small"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <circle cx="12" cy="12" r="8"></circle>
-                </svg>
-                <span v-else>-</span>
+              <div class="value">
+                <div
+                  v-if="!winner && !isDraw"
+                  class="turn-piece"
+                  :class="{ p1: currentPlayer === 1, p2: currentPlayer === 2 }"
+                ></div>
+                <span v-else style="color: white">-</span>
               </div>
             </div>
           </div>
 
           <div class="controls-container">
             <div class="control-item">
-              <span>Action</span>
-              <div><span class="key">CLICK CELL</span></div>
+              <span>Drop Piece</span>
+              <div><span class="key">CLICK</span></div>
             </div>
             <div class="control-item">
               <span>Restart</span>
@@ -232,67 +242,93 @@ onUnmounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }
 
 .board {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 12px;
-  width: 420px;
-  height: 420px;
+  display: flex;
+  gap: 8px;
   background-color: #0d0d0d;
-  padding: 12px;
-  border-radius: 4px;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 4px;
+  transition: background 0.15s ease;
+}
+
+.column.col-hovered {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .cell {
-  background: rgba(255, 255, 255, 0.05);
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  color: white;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  outline: none;
-  user-select: none;
 }
 
-.mark-icon {
-  width: 100px;
-  height: 100px;
+.piece {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: transparent;
+  transition:
+    background 0.1s ease,
+    box-shadow 0.1s ease;
 }
 
-.mark-icon-small {
-  width: 36px;
-  height: 36px;
+.piece.p1 {
+  background: #0dc2ff;
+  box-shadow: 0 0 10px rgba(13, 194, 255, 0.35);
 }
 
-.cell:focus {
-  outline: none;
+.piece.p2 {
+  background: #ff0d72;
+  box-shadow: 0 0 10px rgba(255, 13, 114, 0.35);
 }
 
-.cell:not(.disabled):hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: scale(0.97);
+.piece.dropping {
+  animation: drop-in 0.18s ease-out;
 }
 
-.cell.disabled {
-  cursor: default;
+@keyframes drop-in {
+  from {
+    transform: scale(0.5);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.x-cell {
-  color: #0dc2ff !important;
-  text-shadow: 0 0 20px rgba(13, 194, 255, 0.5);
-  filter: drop-shadow(0 0 10px rgba(13, 194, 255, 0.4));
+.piece.winning-piece {
+  animation: pulse 0.75s ease-in-out infinite alternate;
 }
 
-.o-cell {
-  color: #ff0d72 !important;
-  text-shadow: 0 0 20px rgba(255, 13, 114, 0.5);
-  filter: drop-shadow(0 0 10px rgba(255, 13, 114, 0.4));
+@keyframes pulse {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0.55;
+    transform: scale(0.88);
+  }
 }
 
 .right-section {
@@ -380,6 +416,22 @@ onUnmounted(() => {
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
 }
 
+.turn-piece {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.turn-piece.p1 {
+  background: #0dc2ff;
+  box-shadow: 0 0 10px rgba(13, 194, 255, 0.35);
+}
+
+.turn-piece.p2 {
+  background: #ff0d72;
+  box-shadow: 0 0 10px rgba(255, 13, 114, 0.35);
+}
+
 .controls-container {
   margin-top: 5px;
   padding: 0 5px;
@@ -442,25 +494,13 @@ onUnmounted(() => {
   outline: none;
 }
 
-.mobile-msg {
-  display: none;
-}
-
 .desktop-game {
   display: block;
 }
 
-@media (max-width: 850px) {
+@media (max-width: 1000px) {
   .desktop-game {
     display: none !important;
-  }
-  .mobile-msg {
-    display: flex !important;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    text-align: center;
-    padding: 0 20px;
   }
 }
 </style>
